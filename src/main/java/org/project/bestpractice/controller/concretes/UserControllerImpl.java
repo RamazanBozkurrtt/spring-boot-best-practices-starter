@@ -2,7 +2,6 @@ package org.project.bestpractice.controller.concretes;
 
 import jakarta.validation.Valid;
 import org.project.bestpractice.controller.RestBaseController;
-import org.project.bestpractice.controller.abstracts.IUserController;
 import org.project.bestpractice.dto.request.UserRequest;
 import org.project.bestpractice.dto.response.UserResponse;
 import org.project.bestpractice.entities.RootEntity;
@@ -14,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "rest/api/user")
-public  class UserControllerImpl <T> extends RestBaseController<T> implements IUserController {
+public  class UserControllerImpl extends RestBaseController {
 
     IUserService userService;
 
@@ -23,32 +22,33 @@ public  class UserControllerImpl <T> extends RestBaseController<T> implements IU
     }
 
 
-    @Override
+
     @GetMapping(path = "/getById/{id}")
     public RootEntity<UserResponse> getUserById(@PathVariable(required = true) UUID id) {
-        return null;
+        return ok(userService.getUserById(id));
     }
 
-    @Override
+
     @GetMapping(path = "/getUserList")
     public RootEntity<List<UserResponse>> getUserList() {
-        return null;
+        return ok(userService.getUserList());
     }
 
-    @Override
-    @PutMapping(path = "/addUser")
+
+    @PostMapping(path = "/addUser")
     public RootEntity<UserResponse> addUser(@RequestBody(required = true) @Valid UserRequest userRequest) {
-        return null;
+        return ok(userService.addUser(userRequest));
     }
 
-    @Override
-    @PutMapping(path = "/updateUser")
-    public RootEntity<UserResponse> updateUser(@RequestBody(required = true) @Valid UserRequest userRequest) {
-        return null;
+
+    @PutMapping(path = "/updateUser/{id}")
+    public RootEntity<UserResponse> updateUser(@PathVariable(name = "id",required = true) UUID id,@RequestBody(required = true) @Valid UserRequest userRequest) {
+        return ok(userService.updateUser(userRequest,id));
     }
 
-    @Override
-    public RootEntity<UserResponse> deleteUserById(UUID id) {
-        return null;
+
+    @DeleteMapping(path = "/deleteUserById/{id}")
+    public RootEntity<UserResponse> deleteUserById(@PathVariable(required = true) UUID id) {
+        return ok(userService.deleteUserById(id));
     }
 }

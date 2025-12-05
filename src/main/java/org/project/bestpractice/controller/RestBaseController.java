@@ -1,6 +1,5 @@
 package org.project.bestpractice.controller;
 
-import jakarta.persistence.criteria.Root;
 import org.project.bestpractice.entities.RootEntity;
 
 public class RestBaseController<T> {

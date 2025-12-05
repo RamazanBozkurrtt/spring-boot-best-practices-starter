@@ -1,51 +1,32 @@
 package org.project.bestpractice.dto.request;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
+@Builder
 public class UserRequest {
 
-    private UUID id;
-
-    @Size(min = 1, max = 35)
+    @NotNull(message = "Kullanıcı adı boş olamaz")
     @NotEmpty
-    @NotNull
+    @Size(min = 3, max = 35, message = "Kullanıcı adı 3-35 karakter olmalı")
     private String username;
 
-    @Size(min = 1, max = 20)
+    @NotNull(message = "Şifre boş olamaz")
     @NotEmpty
-    @NotNull
+    @Size(min = 6, max = 20, message = "Şifre en az 6 karakter olmalı")
     private String password;
 
-    @Email
-    @Size(min = 1, max = 80)
+    @Email(message = "Geçerli bir e-posta formatı girin")
+    @NotEmpty
+    @Size(max = 80)
     private String email;
-
-    @NotNull
-    @NotEmpty
-    private LocalDateTime createdAt;
-
-    @NotNull
-    @NotEmpty
-    private LocalDateTime updatedAt;
 }

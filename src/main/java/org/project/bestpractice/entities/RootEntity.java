@@ -1,34 +1,50 @@
 package org.project.bestpractice.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 public class RootEntity<T> {
 
     private boolean status;
     private String message;
     private T data;
 
+    public RootEntity() {}
+
+    public RootEntity(boolean status, String message, T data) {
+        this.setStatus(status);
+        this.setMessage(message);
+        this.setData(data);
+    }
+
     public static <T> RootEntity<T> ok(T data) {
-        RootEntity<T> entity = new RootEntity<T>();
-        entity.setStatus(true);
-        entity.setMessage("success");
-        entity.setData(data);
-        return entity;
+
+        return new RootEntity<>(true,"success",data);
     }
 
     public static <T> RootEntity<T> error(T data) {
-        RootEntity<T> entity = new RootEntity<T>();
-        entity.setStatus(false);
-        entity.setMessage("error");
-        entity.setData(null);
-        return entity;
+        return new RootEntity<>(false,"error",data);
     }
 
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 }
