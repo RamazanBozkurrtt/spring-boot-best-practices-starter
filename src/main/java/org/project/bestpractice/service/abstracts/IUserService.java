@@ -14,7 +14,7 @@ public interface IUserService {
 
     UserResponse addUser(UserRequest userRequest);
 
-    UserResponse updateUser(UserRequest userRequest);
+    UserResponse updateUser(UserRequest userRequest,UUID id);
 
     UserResponse deleteUserById(UUID id);
 

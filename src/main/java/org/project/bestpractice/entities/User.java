@@ -1,10 +1,7 @@
 package org.project.bestpractice.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,22 +11,21 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Table(name = "user")
+@Data
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = false, length = 20)
+    @Column(name = "username",unique = false, length = 20)
     private String username;
 
-    @Column(length = 30, nullable = false, unique = true)
+    @Column(name = "email",length = 45, nullable = false, unique = true)
     private String email;
 
-    @Column(length = 60,nullable = false)
+    @Column(name = "password", length = 60,nullable = false)
     private String password;
 
     @CreationTimestamp
