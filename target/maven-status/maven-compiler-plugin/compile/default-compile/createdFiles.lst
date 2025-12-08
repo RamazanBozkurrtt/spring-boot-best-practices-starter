@@ -1,0 +1,15 @@
+org\project\bestpractice\controller\RestBaseController.class
+org\project\bestpractice\repository\UserRepository.class
+org\project\bestpractice\entities\User.class
+org\project\bestpractice\controller\concretes\UserControllerImpl.class
+org\project\bestpractice\dto\request\UserRequest$UserRequestBuilder.class
+org\project\bestpractice\dto\response\UserResponse$UserResponseBuilder.class
+org\project\bestpractice\configuration\mapper\UserMapper.class
+org\project\bestpractice\configuration\mapper\BaseMapper.class
+org\project\bestpractice\configuration\mapper\UserMapperImpl.class
+org\project\bestpractice\service\abstracts\IUserService.class
+org\project\bestpractice\dto\response\UserResponse.class
+org\project\bestpractice\entities\RootEntity.class
+org\project\bestpractice\BestPracticeApplication.class
+org\project\bestpractice\dto\request\UserRequest.class
+org\project\bestpractice\service\concretes\UserServiceImpl.class
