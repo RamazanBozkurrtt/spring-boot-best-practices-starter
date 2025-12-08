@@ -1,49 +1,37 @@
 package org.project.bestpractice.handling;
 
 
-import org.project.bestpractice.exceptions.ApiError;
-import org.project.bestpractice.exceptions.ApiErrorValidations;
-import org.project.bestpractice.exceptions.BaseException;
-import org.project.bestpractice.exceptions.Exception;
+import jakarta.servlet.http.HttpServletRequest;
+import org.project.bestpractice.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {BaseException.class})
-    public ResponseEntity<ApiError> handleBaseException(BaseException ex, WebRequest webRequest) {
-        return ResponseEntity.badRequest().body(createApiError(ex.getMessage(),webRequest));
+
+    //Business Exception
+    @ExceptionHandler(value = {BusinessException.class})
+    public ResponseEntity<ApiErrorResponse> handleBaseException(BusinessException ex, HttpServletRequest webRequest) {
+        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
+                .id(UUID.randomUUID())
+                .path(webRequest.getRequestURI())
+                .createTime(LocalDateTime.now())
+                .message(ex.getMessage())
+                .hostName(getHostName())
+                .build();
+        return ResponseEntity.badRequest().body(apiErrorResponse);
     }
 
-    private <M> ApiError<M> createApiError(M message,WebRequest webRequest){
-        ApiError<M>  apiError = new ApiError<>();
-        Exception<M>  exception = new Exception<>();
-        exception.setCreateDate(LocalDateTime.now());
-        exception.setPath(webRequest.getDescription(false).substring(4));
-        exception.setHostName(getHostName());
-        exception.setErrorMessage(message);
-
-        apiError.setException(exception);
-        apiError.setStatus(HttpStatus.BAD_REQUEST.value());
-
-        return apiError;
-
-    }
 
     private String getHostName(){
         try {
@@ -54,33 +42,42 @@ public class GlobalExceptionHandler {
         return null;
     }
 
-    private List<String> addValueToList(List<String> list,String value){
-        list.add(value);
-        return list;
-    }
-
+    //Validation Exception HAndler
     @ExceptionHandler(exception =  MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorValidations> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        HashMap<String, List<String>> errors = new HashMap<String,List<String>>();
+    public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException e, HttpServletRequest request) {
+        HashMap<String, List<String>> errors = new HashMap<>();
 
-        for(ObjectError error : e.getBindingResult().getAllErrors()) {
-            String fieldName = ((FieldError)error).getField();
-            if (errors.containsKey(fieldName)) {
-                errors.put(fieldName,addValueToList(errors.get(fieldName),error.getDefaultMessage()));
-            }else{
-                errors.put(fieldName,addValueToList(new ArrayList<String>(),error.getDefaultMessage()));
-            }
+        for(FieldError error : e.getBindingResult().getFieldErrors()) {
+            errors.computeIfAbsent(error.getField(),k->new ArrayList<>())
+                    .add(error.getDefaultMessage());
         }
+        ApiErrorResponse<Map<String, List<String>>> apiErrorResponse = ApiErrorResponse.<Map<String, List<String>>>builder()
+                .createTime(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .hostName(getHostName())
+                .message("Validation Error!")
+                .id(UUID.randomUUID())
+                .data(errors)
+                .build();
 
-        return ResponseEntity.badRequest().body(createApiError(errors));
+        return ResponseEntity.badRequest().body(apiErrorResponse);
     }
 
-    private <T> ApiErrorValidations<T> createApiError(T errors){
-        ApiErrorValidations<T> apiError = new ApiErrorValidations<>();
-        apiError.setErrorTime(LocalDateTime.now());
-        apiError.setId(UUID.randomUUID().toString());
-        apiError.setData(errors);
+    //Global Exception Handler
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleAllExceptions(Exception e, HttpServletRequest request) {
+        // logging
 
-        return apiError;
+        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
+                .id(UUID.randomUUID())
+                .createTime(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .message("Bilinmeyen bir hata gerçekleşti!")
+                .hostName(getHostName())
+                .build();
+
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }

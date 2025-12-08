@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum MessageTypes {
 
-    NO_RECORD_EXITS("1001","Record Not Found"),
+    NO_RECORD_EXISTS("1001","Record Not Found"),
     GENERAL_EXCEPTION("9999","An Exception Occurred"),;
 
     private String code;
