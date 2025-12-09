@@ -40,7 +40,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public CustomPageResponse<UserResponse> getUserList(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createdAt"));
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createdDate"));
         Page<User> userPage = userRepository.findAll(pageable);
 
         List<UserResponse> dtoList = userMapper.toResponseListFromEntityList(userPage.getContent());
