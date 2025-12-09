@@ -1,5 +1,6 @@
 package org.project.bestpractice.controller.concretes;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.project.bestpractice.controller.RestBaseController;
 import org.project.bestpractice.dto.request.UserRequest;
@@ -26,6 +27,8 @@ public class UserControllerImpl extends RestBaseController {
 
 
     @GetMapping(path = "/getById/{id}")
+    @Operation(summary = "Id ile kullanıcı arama",
+            description = "Sistem üzerinden id'si belirtilen kullanıcıyı çeker")
     public ResponseEntity<RestResponse<UserResponse>> getUserById(@PathVariable(required = true) UUID id) {
         return ok(userService.getUserById(id));
     }
@@ -41,6 +44,8 @@ public class UserControllerImpl extends RestBaseController {
 
 
     @PostMapping(path = "/addUser")
+    @Operation(summary = "Yeni Kullanıcı Oluştur",
+            description = "Sisteme yeni bir kullanıcı kaydeder. Email unique olmalıdır.")
     public ResponseEntity<RestResponse<UserResponse>> addUser(@RequestBody(required = true) @Valid UserRequest userRequest) {
         return ok(userService.addUser(userRequest));
     }
