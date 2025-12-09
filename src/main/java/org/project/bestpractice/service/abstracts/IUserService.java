@@ -1,6 +1,7 @@
 package org.project.bestpractice.service.abstracts;
 
 import org.project.bestpractice.dto.request.UserRequest;
+import org.project.bestpractice.dto.response.CustomPageResponse;
 import org.project.bestpractice.dto.response.UserResponse;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface IUserService {
 
     UserResponse getUserById(UUID id);
 
-    List<UserResponse> getUserList();
+    CustomPageResponse<UserResponse> getUserList(int pageNumber, int pageSize);
 
     UserResponse addUser(UserRequest userRequest);
 

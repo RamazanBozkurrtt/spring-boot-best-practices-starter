@@ -16,12 +16,12 @@ import lombok.*;
 public class UserRequest {
 
     @NotNull(message = "Kullanıcı adı boş olamaz")
-    @NotEmpty
+    @NotEmpty(message = "Kullanıcı adı boş olamaz")
     @Size(min = 3, max = 35, message = "Kullanıcı adı 3-35 karakter olmalı")
     private String username;
 
     @NotNull(message = "Şifre boş olamaz")
-    @NotEmpty
+    @NotEmpty(message = "Şifre boş olamaz")
     @Size(min = 6, max = 20, message = "Şifre en az 6 karakter olmalı")
     private String password;
 

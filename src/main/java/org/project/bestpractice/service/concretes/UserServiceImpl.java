@@ -3,13 +3,21 @@ package org.project.bestpractice.service.concretes;
 import jakarta.transaction.Transactional;
 import org.project.bestpractice.configuration.mapper.UserMapper;
 import org.project.bestpractice.dto.request.UserRequest;
+import org.project.bestpractice.dto.response.CustomPageResponse;
 import org.project.bestpractice.dto.response.UserResponse;
 import org.project.bestpractice.entities.User;
+import org.project.bestpractice.exceptions.BusinessException;
+import org.project.bestpractice.exceptions.MessageTypes;
 import org.project.bestpractice.repository.UserRepository;
 import org.project.bestpractice.service.abstracts.IUserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,12 +39,23 @@ public class UserServiceImpl implements IUserService {
         return user.map(value -> userMapper.toResponseFromEntity(value)).orElse(null);
     }
 
-    public List<UserResponse> getUserList() {
-        return userMapper.toResponseListFromEntityList(userRepository.findAll());
+    public CustomPageResponse<UserResponse> getUserList(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createdAt"));
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        List<UserResponse> dtoList = userMapper.toResponseListFromEntityList(userPage.getContent());
+
+
+
+        return CustomPageResponse.of(userPage,dtoList);
     }
 
     @Transactional
     public UserResponse addUser(UserRequest userRequest) {
+
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new BusinessException(MessageTypes.RECORD_ALREADY_EXIST);
+        }
         User user = userMapper.toEntityFromRequest(userRequest);
         userRepository.save(user);
         return userMapper.toResponseFromEntity(user);
@@ -52,11 +71,7 @@ public class UserServiceImpl implements IUserService {
             userRepository.save(userDb.get());
             return userMapper.toResponseFromEntity(userDb.get());
         }
-
-
-
-
-        return null;
+        throw new BusinessException(MessageTypes.NO_RECORD_EXISTS);
     }
 
     @Transactional
@@ -65,9 +80,8 @@ public class UserServiceImpl implements IUserService {
         if (user.isPresent()) {
             userRepository.delete(user.get());
             return userMapper.toResponseFromEntity(user.get());
-        } else {
-            return null;
         }
+        throw new BusinessException(MessageTypes.NO_RECORD_EXISTS);
     }
 
 
