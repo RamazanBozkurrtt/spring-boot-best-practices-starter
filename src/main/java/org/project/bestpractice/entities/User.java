@@ -13,11 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @Table(name = "users")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+@EqualsAndHashCode(callSuper = true)
+public class User extends BaseEntity {
 
     @Column(name = "username",unique = false, length = 30, nullable = false)
     private String username;
@@ -28,10 +25,6 @@ public class User {
     @Column(name = "password", length = 60,nullable = false)
     private String password;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
 }

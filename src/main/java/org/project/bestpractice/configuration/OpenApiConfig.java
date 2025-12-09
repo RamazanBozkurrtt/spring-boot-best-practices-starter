@@ -1,4 +1,4 @@
-package org.project.bestpractice.configuration.swagger;
+package org.project.bestpractice.configuration;
 
 
 import io.swagger.v3.oas.models.OpenAPI;
