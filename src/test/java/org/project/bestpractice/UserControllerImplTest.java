@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerImplTest {
 
     @Autowired
@@ -40,9 +40,9 @@ class UserControllerImplTest {
     //1. ADD USER TEST
     @Test
     void addUser_shouldReturnOk_whenRequestIsValid() throws Exception {
-        UserRequest request = new UserRequest("ramazan", "123456789", "ramazan@test.com");
+        UserRequest request = new UserRequest("ramazan","bozkurt", "123456789", "ramazan@test.com");
 
-        UserResponse mockResponse = UserResponse.builder().id(UUID.randomUUID()).email("ramazan@test.com").username("ramazan").build();
+        UserResponse mockResponse = UserResponse.builder().id(UUID.randomUUID()).email("ramazan@test.com").firstname("ramazan").lastname("bozkurt").build();
         when(userService.addUser(any(UserRequest.class))).thenReturn(mockResponse);
 
 
@@ -62,7 +62,8 @@ class UserControllerImplTest {
         UUID userId = UUID.randomUUID();
         UserResponse mockResponse = new UserResponse();
         mockResponse.setId(userId);
-        mockResponse.setUsername("ramazan");
+        mockResponse.setFirstname("ramazan");
+        mockResponse.setLastname("bozkurt");
         mockResponse.setEmail("ramazan@gmail.com");
 
         when(userService.getUserById(userId)).thenReturn(mockResponse);
@@ -78,8 +79,8 @@ class UserControllerImplTest {
     void getUserList_shouldReturnList() throws Exception {
         // Listeyi hazırladık
         List<UserResponse> mockList = List.of(
-                UserResponse.builder().id(UUID.randomUUID()).username("sedat").email("sedat@gmail.com").build(),
-                UserResponse.builder().id(UUID.randomUUID()).username("burak").email("burak@gmail.com").build()
+                UserResponse.builder().id(UUID.randomUUID()).firstname("sedat").lastname("ünal").email("sedat@gmail.com").build(),
+                UserResponse.builder().id(UUID.randomUUID()).firstname("burak").lastname("atık").email("burak@gmail.com").build()
         );
 
         // DÜZELTME 3: Listeyi CustomPageResponse içine koyduk.
@@ -103,7 +104,7 @@ class UserControllerImplTest {
     //4. VALIDATION TEST
     @Test
     void addUser_shouldReturnBadRequest_whenEmailIsInvalid() throws Exception {
-        UserRequest invalidRequest = new UserRequest("ramazan", "bozuk-email", "123");
+        UserRequest invalidRequest = new UserRequest("ramazan","bozkurt", "bozuk-email", "123");
 
         mockMvc.perform(post("/rest/api/user/addUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,6 +118,7 @@ class UserControllerImplTest {
     void updateUser_shouldReturnOk_whenRequestIsValid() throws Exception {
         UserRequest updateRequest = new UserRequest(
                 "ramazan_updated",
+                "bozkurt_updated",
                 "newPassword123",
                 "ramazan_new@test.com"
 
@@ -126,7 +128,8 @@ class UserControllerImplTest {
         UserResponse mockResponse = UserResponse
                 .builder().email("ramazan_new@test.com")
                 .id(userId)
-                .username("ramazan_updated")
+                .firstname("ramazan_updated")
+                .lastname("bozkurt_updated")
                 .build();
 
         when(userService.updateUser(any(UserRequest.class),eq(userId))).thenReturn(mockResponse);

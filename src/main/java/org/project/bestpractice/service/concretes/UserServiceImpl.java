@@ -65,7 +65,8 @@ public class UserServiceImpl implements IUserService {
     public UserResponse updateUser(UserRequest userRequest,UUID id) {
         Optional<User> userDb = userRepository.findById(id);
         if (userDb.isPresent()) {
-            userDb.get().setUsername(userRequest.getUsername());
+            userDb.get().setFirstname(userRequest.getFirstname());
+            userDb.get().setLastname(userRequest.getLastname());
             userDb.get().setEmail(userRequest.getEmail());
             userDb.get().setPassword(userRequest.getPassword());
             userRepository.save(userDb.get());

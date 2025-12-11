@@ -1,6 +1,7 @@
 package org.project.bestpractice.handling;
 
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.project.bestpractice.exceptions.*;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,18 @@ public class GlobalExceptionHandler {
     //Business Exception
     @ExceptionHandler(value = {BusinessException.class})
     public ResponseEntity<ApiErrorResponse> handleBaseException(BusinessException ex, HttpServletRequest webRequest) {
+        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
+                .id(UUID.randomUUID())
+                .path(webRequest.getRequestURI())
+                .createTime(LocalDateTime.now())
+                .message(ex.getMessage())
+                .hostName(getHostName())
+                .build();
+        return ResponseEntity.badRequest().body(apiErrorResponse);
+    }
+
+    @ExceptionHandler(value = {ExpiredJwtException.class})
+    public ResponseEntity<ApiErrorResponse> handleExpiredJwtException(Exception ex, HttpServletRequest webRequest) {
         ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
                 .id(UUID.randomUUID())
                 .path(webRequest.getRequestURI())

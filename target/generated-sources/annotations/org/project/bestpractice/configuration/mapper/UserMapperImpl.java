@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-10T03:11:04+0300",
+    date = "2025-12-10T17:33:45+0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
 )
 @Component
@@ -25,7 +25,8 @@ public class UserMapperImpl implements UserMapper {
         User user = new User();
 
         user.setId( Response.getId() );
-        user.setUsername( Response.getUsername() );
+        user.setFirstname( Response.getFirstname() );
+        user.setLastname( Response.getLastname() );
         user.setEmail( Response.getEmail() );
 
         return user;
@@ -40,7 +41,8 @@ public class UserMapperImpl implements UserMapper {
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
         userResponse.id( entity.getId() );
-        userResponse.username( entity.getUsername() );
+        userResponse.firstname( entity.getFirstname() );
+        userResponse.lastname( entity.getLastname() );
         userResponse.email( entity.getEmail() );
 
         return userResponse.build();
@@ -54,7 +56,8 @@ public class UserMapperImpl implements UserMapper {
 
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
-        userResponse.username( dto.getUsername() );
+        userResponse.firstname( dto.getFirstname() );
+        userResponse.lastname( dto.getLastname() );
         userResponse.email( dto.getEmail() );
 
         return userResponse.build();
@@ -68,7 +71,8 @@ public class UserMapperImpl implements UserMapper {
 
         User user = new User();
 
-        user.setUsername( dto.getUsername() );
+        user.setFirstname( dto.getFirstname() );
+        user.setLastname( dto.getLastname() );
         user.setEmail( dto.getEmail() );
         user.setPassword( dto.getPassword() );
 
