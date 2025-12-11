@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.project.bestpractice.dto.request.UserRequest;
 import org.project.bestpractice.dto.response.CustomPageResponse;
 import org.project.bestpractice.dto.response.UserResponse;
-import org.project.bestpractice.service.abstracts.IUserService;
+import org.project.bestpractice.service.abstracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +35,7 @@ class UserControllerImplTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private IUserService userService;
+    private UserService userService;
 
     //1. ADD USER TEST
     @Test

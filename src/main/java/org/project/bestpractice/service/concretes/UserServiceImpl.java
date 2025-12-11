@@ -9,21 +9,19 @@ import org.project.bestpractice.entities.User;
 import org.project.bestpractice.exceptions.BusinessException;
 import org.project.bestpractice.exceptions.MessageTypes;
 import org.project.bestpractice.repository.UserRepository;
-import org.project.bestpractice.service.abstracts.IUserService;
+import org.project.bestpractice.service.abstracts.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
 

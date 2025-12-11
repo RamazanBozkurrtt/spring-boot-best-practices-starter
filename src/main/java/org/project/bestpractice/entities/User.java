@@ -17,9 +17,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "_user")
 @EqualsAndHashCode(callSuper = true)
-public class User extends BaseEntity {
+public class User extends BaseEntity<UUID> {
 
     @Column(unique = false, nullable = false,name = "firstname")
     private String firstname;

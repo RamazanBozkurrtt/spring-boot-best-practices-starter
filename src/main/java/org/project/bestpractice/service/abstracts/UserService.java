@@ -4,10 +4,9 @@ import org.project.bestpractice.dto.request.UserRequest;
 import org.project.bestpractice.dto.response.CustomPageResponse;
 import org.project.bestpractice.dto.response.UserResponse;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface IUserService {
+public interface UserService {
 
     UserResponse getUserById(UUID id);
 
