@@ -1,11 +1,13 @@
 package org.project.bestpractice.handling;
 
-
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException; // DÜZELTİLDİ: JWT için doğru paket bu
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.project.bestpractice.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException; // EKLENDİ
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -17,51 +19,38 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
 
     //Business Exception
     @ExceptionHandler(value = {BusinessException.class})
     public ResponseEntity<ApiErrorResponse> handleBaseException(BusinessException ex, HttpServletRequest webRequest) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
-                .path(webRequest.getRequestURI())
-                .createTime(LocalDateTime.now())
-                .message(ex.getMessage())
-                .hostName(getHostName())
-                .build();
-        return ResponseEntity.badRequest().body(apiErrorResponse);
+        log.warn("Business Exception | Message: {} | Path: {}", ex.getMessage(), webRequest.getRequestURI());
+        return buildErrorResponse(ex.getMessage(), webRequest.getRequestURI(), HttpStatus.BAD_REQUEST);
     }
 
-    private String getHostName(){
-        try {
-            return  InetAddress.getLocalHost().getHostName();
-        }catch (UnknownHostException e){
-            System.out.println("UnknownHostException");
-        }
-        return null;
-    }
-
-    //Validation Exception HAndler
-    @ExceptionHandler(exception =  MethodArgumentNotValidException.class)
+    //Validation Exception Handler
+    @ExceptionHandler(exception = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException e, HttpServletRequest request) {
-        HashMap<String, List<String>> errors = new HashMap<>();
 
-        for(FieldError error : e.getBindingResult().getFieldErrors()) {
-            errors.computeIfAbsent(error.getField(),k->new ArrayList<>())
+        log.warn("Validation Error | Path: {}", request.getRequestURI());
+
+        HashMap<String, List<String>> errors = new HashMap<>();
+        for (FieldError error : e.getBindingResult().getFieldErrors()) {
+            errors.computeIfAbsent(error.getField(), k -> new ArrayList<>())
                     .add(error.getDefaultMessage());
         }
+
         ApiErrorResponse<Map<String, List<String>>> apiErrorResponse = ApiErrorResponse.<Map<String, List<String>>>builder()
                 .createTime(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .hostName(getHostName())
-                .message("Validation Error!")
+                .message("Validasyon Hatası!")
                 .id(UUID.randomUUID())
                 .data(errors)
                 .build();
@@ -69,94 +58,86 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiErrorResponse);
     }
 
+    @ExceptionHandler(value = {BadCredentialsException.class})
+    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(Exception e, HttpServletRequest request) {
+        log.warn("Failed Login (Bad Credentials) | IP: {} | Path: {}", request.getRemoteAddr(), request.getRequestURI());
+        return buildErrorResponse("Email veya şifre hatalı!", request.getRequestURI(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = {UsernameNotFoundException.class})
+    public ResponseEntity<ApiErrorResponse> handleUsernameNotFoundException(Exception e, HttpServletRequest request) {
+        log.warn("User Not Found | Path: {}", request.getRequestURI());
+        return buildErrorResponse("Kullanıcı Bulunamadı!", request.getRequestURI(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {LockedException.class, DisabledException.class})
+    public ResponseEntity<ApiErrorResponse> handleAccountStatusExceptions(Exception e, HttpServletRequest request) {
+        log.warn("Locked/Disabled Account Attempt | IP: {}", request.getRemoteAddr());
+        return buildErrorResponse("Hesabınız kilitlenmiş veya pasif durumda!", request.getRequestURI(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = {ExpiredJwtException.class})
+    public ResponseEntity<ApiErrorResponse> handleExpiredJwtException(Exception e, HttpServletRequest request) {
+        log.warn("Token Expired | IP: {}", request.getRemoteAddr());
+        return buildErrorResponse("Oturum süreniz dolmuş, lütfen tekrar giriş yapın.", request.getRequestURI(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = {SignatureException.class})
+    public ResponseEntity<ApiErrorResponse> handleSignatureException(Exception e, HttpServletRequest request) {
+        log.warn("Invalid Token Signature (Potential Attack) | IP: {}", request.getRemoteAddr());
+        return buildErrorResponse("Geçersiz Token!", request.getRequestURI(), HttpStatus.UNAUTHORIZED);
+    }
+
+
+    @ExceptionHandler(value = {AccessDeniedException.class})
+    public ResponseEntity<ApiErrorResponse> handleAccessDeniedException(Exception e, HttpServletRequest request) {
+        log.warn("Access Denied (Forbidden) | User tried to access: {}", request.getRequestURI());
+        return buildErrorResponse("Bu işlemi yapmaya yetkiniz yok!", request.getRequestURI(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = {RuntimeException.class})
+    public ResponseEntity<ApiErrorResponse> handleRuntimeException(Exception e, HttpServletRequest request) {
+        log.warn("Runtime Exception: {}", e.getMessage());
+        return buildErrorResponse(e.getMessage(), request.getRequestURI(), HttpStatus.BAD_REQUEST);
+    }
+
+
     //Global Exception Handler
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleAllExceptions(Exception e, HttpServletRequest request) {
-        // logging
+
+        UUID traceId = UUID.randomUUID();
+
+        log.error("CRITICAL ERROR | TraceID: {} | Path: {} | Message: {}", traceId, request.getRequestURI(), e.getMessage(), e);
 
         ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
+                .id(traceId)
                 .createTime(LocalDateTime.now())
                 .path(request.getRequestURI())
-                .message("Bilinmeyen bir hata gerçekleşti!")
+                .message("Bilinmeyen bir hata gerçekleşti. Hata Kodu: " + traceId)
                 .hostName(getHostName())
                 .build();
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = {BadCredentialsException.class})
-    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(Exception e, HttpServletRequest request) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
+
+    private ResponseEntity<ApiErrorResponse> buildErrorResponse(String message, String path, HttpStatus status) {
+        ApiErrorResponse<?> response = ApiErrorResponse.builder()
                 .id(UUID.randomUUID())
+                .path(path)
                 .createTime(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .message("Email veya şifre hatalı !")
+                .message(message)
                 .hostName(getHostName())
                 .build();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiErrorResponse);
+        return new ResponseEntity<>(response, status);
     }
 
-    @ExceptionHandler(value = {UsernameNotFoundException.class})
-    public ResponseEntity<ApiErrorResponse> handleUsernameNotFoundException(Exception e, HttpServletRequest request) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
-                .createTime(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .message("Email Bulunamadı!")
-                .hostName(getHostName())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
+    private String getHostName() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            return "Unknown";
+        }
     }
-
-    @ExceptionHandler(value = {LockedException.class, DisabledException.class})
-    public ResponseEntity<ApiErrorResponse> handleAccountStatusExceptions(Exception e, HttpServletRequest request) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
-                .createTime(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .message("Hesabınız kilitlenmiş veya pasif durumda !")
-                .hostName(getHostName())
-                .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiErrorResponse);
-    }
-
-    @ExceptionHandler(value = {ExpiredJwtException.class})
-    public ResponseEntity<ApiErrorResponse> handleExpiredJwtException(Exception e, HttpServletRequest request) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
-                .createTime(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .message("Oturum süreniz dolmuş, lütfen tekrar giriş yapın.")
-                .hostName(getHostName())
-                .build();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiErrorResponse);
-    }
-
-
-    @ExceptionHandler(value = {SignatureException.class})
-    public ResponseEntity<ApiErrorResponse> handleSignatureException(Exception e, HttpServletRequest request) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
-                .createTime(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .message("Geçersiz Token!")
-                .hostName(getHostName())
-                .build();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiErrorResponse);
-    }
-
-    @ExceptionHandler(value = {RuntimeException.class})
-    public ResponseEntity<ApiErrorResponse> handleRuntimeException(Exception e, HttpServletRequest request) {
-        ApiErrorResponse<?> apiErrorResponse = ApiErrorResponse.builder()
-                .id(UUID.randomUUID())
-                .createTime(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .message(e.getMessage())
-                .hostName(getHostName())
-                .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
-    }
-
 }

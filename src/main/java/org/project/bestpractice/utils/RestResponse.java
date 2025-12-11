@@ -38,6 +38,10 @@ public class RestResponse<T> {
         return new RestResponse<>(true,"created",data,LocalDateTime.now());
     }
 
+    public static <T> RestResponse<T> error(T data) {
+        return new RestResponse<>(false,"error",null,LocalDateTime.now());
+    }
+
     public boolean isStatus() {
         return status;
     }
