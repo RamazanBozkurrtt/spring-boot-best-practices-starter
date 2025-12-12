@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-10T17:33:45+0300",
+    date = "2025-12-12T04:18:13+0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
 )
 @Component
@@ -22,14 +22,15 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        User user = new User();
+        User.UserBuilder user = User.builder();
 
-        user.setId( Response.getId() );
-        user.setFirstname( Response.getFirstname() );
-        user.setLastname( Response.getLastname() );
-        user.setEmail( Response.getEmail() );
+        user.firstname( Response.getFirstname() );
+        user.lastname( Response.getLastname() );
+        user.email( Response.getEmail() );
+        user.active( Response.isActive() );
+        user.locked( Response.isLocked() );
 
-        return user;
+        return user.build();
     }
 
     @Override
@@ -44,6 +45,8 @@ public class UserMapperImpl implements UserMapper {
         userResponse.firstname( entity.getFirstname() );
         userResponse.lastname( entity.getLastname() );
         userResponse.email( entity.getEmail() );
+        userResponse.active( entity.isActive() );
+        userResponse.locked( entity.isLocked() );
 
         return userResponse.build();
     }
@@ -69,14 +72,14 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        User user = new User();
+        User.UserBuilder user = User.builder();
 
-        user.setFirstname( dto.getFirstname() );
-        user.setLastname( dto.getLastname() );
-        user.setEmail( dto.getEmail() );
-        user.setPassword( dto.getPassword() );
+        user.firstname( dto.getFirstname() );
+        user.lastname( dto.getLastname() );
+        user.email( dto.getEmail() );
+        user.password( dto.getPassword() );
 
-        return user;
+        return user.build();
     }
 
     @Override

@@ -39,10 +39,11 @@ public class User extends BaseEntity<UUID> {
     private Role role;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Token> tokens;
 
-    private boolean isActive;
+    private boolean active;
 
-    private boolean isLocked;
+    private boolean locked;
 
 }

@@ -4,6 +4,7 @@ package org.project.bestpractice.controller.concretes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.project.bestpractice.controller.RestBaseController;
 import org.project.bestpractice.payload.AuthenticationRequest;
@@ -28,7 +29,7 @@ public class AuthenticationController extends RestBaseController {
 
     @PostMapping(path = "/register")
     @Operation(summary = "User register",description = "This method creates a new user and return token")
-    public ResponseEntity<RestResponse<AuthenticationResponse>> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<RestResponse<AuthenticationResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         return created(authenticationService.register(registerRequest));
     }
 

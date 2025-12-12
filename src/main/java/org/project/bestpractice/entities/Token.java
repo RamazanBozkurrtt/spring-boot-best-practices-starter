@@ -1,10 +1,7 @@
 package org.project.bestpractice.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.project.bestpractice.jwt.TokenType;
 
 @Data
@@ -29,6 +26,7 @@ public class Token {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     public User user;
 
 }

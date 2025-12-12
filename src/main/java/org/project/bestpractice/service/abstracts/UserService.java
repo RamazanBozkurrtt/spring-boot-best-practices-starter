@@ -18,4 +18,6 @@ public interface UserService {
 
     UserResponse deleteUserById(UUID id);
 
+    UserResponse deleteUserSoftlyById(UUID id);
+
 }

@@ -41,10 +41,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .firstname(request.firstname())
                 .lastname(request.lastname())
                 .email(request.email())
-                .password(request.password())
+                .password(passwordEncoder.encode(request.password()))
                 .role(request.role())
-                .isActive(true)
-                .isLocked(false)
+                .active(true)
+                .locked(false)
                 .build();
 
         var savedUser = userRepository.save(user);
@@ -57,6 +57,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationResponse(jwtToken, refreshToken);
     }
 
+
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
@@ -65,7 +66,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         request.password()
                 )
         );
-
         var user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException(request.email()));
 
@@ -114,10 +114,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenRepository.save(token);
     }
 
-    private void revokeAllUserTokens(User user) {
+    public void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
+
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);

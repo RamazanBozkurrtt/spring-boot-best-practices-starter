@@ -58,6 +58,6 @@ public class UserControllerImpl extends RestBaseController {
 
     @DeleteMapping(path = "/deleteUserById/{id}")
     public ResponseEntity<RestResponse<UserResponse>> deleteUserById(@PathVariable(required = true) UUID id) {
-        return ok(userService.deleteUserById(id));
+        return ok(userService.deleteUserSoftlyById(id));
     }
 }
