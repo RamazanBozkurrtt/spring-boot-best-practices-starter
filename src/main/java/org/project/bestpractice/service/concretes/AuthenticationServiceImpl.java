@@ -97,7 +97,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         // Yeni Access Token üret
         var accessToken = jwtService.generateToken(userPrincipal);
-        saveUserToken(user, accessToken); // Yeni token'ı kaydet
+        saveUserToken(user, accessToken);
 
         // Service artık direkt cevabı dönüyor, HTTP ile uğraşmıyor.
         return new AuthenticationResponse(accessToken, refreshToken);
