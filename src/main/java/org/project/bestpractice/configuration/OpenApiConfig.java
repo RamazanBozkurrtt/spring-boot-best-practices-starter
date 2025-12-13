@@ -1,9 +1,12 @@
 package org.project.bestpractice.configuration;
 
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +22,13 @@ public class OpenApiConfig {
                         .description("Bu proje Spring Boot Best Practices (AOP, Exception Handling, Layered Arch) kullanılarak geliştirilmiştir.")
                         .contact(new Contact()
                                 .name("Ramazan Bozkurt")
-                                .email("ramazannbozkurrtt@outlook.com")));
+                                .email("ramazannbozkurrtt@outlook.com"))
+                )
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new Components().addSecuritySchemes("bearerAuth",new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
+                        .description("JWT Token")));
+
     }
 
 }

@@ -7,20 +7,19 @@ import org.project.bestpractice.dto.request.UserRequest;
 import org.project.bestpractice.dto.response.CustomPageResponse;
 import org.project.bestpractice.dto.response.UserResponse;
 import org.project.bestpractice.utils.RestResponse;
-import org.project.bestpractice.service.abstracts.IUserService;
+import org.project.bestpractice.service.abstracts.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "rest/api/user")
 public class UserControllerImpl extends RestBaseController {
 
-    IUserService userService;
+    UserService userService;
 
-    public UserControllerImpl(IUserService userService) {
+    public UserControllerImpl(UserService userService) {
         this.userService = userService;
     }
 
@@ -59,6 +58,6 @@ public class UserControllerImpl extends RestBaseController {
 
     @DeleteMapping(path = "/deleteUserById/{id}")
     public ResponseEntity<RestResponse<UserResponse>> deleteUserById(@PathVariable(required = true) UUID id) {
-        return ok(userService.deleteUserById(id));
+        return ok(userService.deleteUserSoftlyById(id));
     }
 }

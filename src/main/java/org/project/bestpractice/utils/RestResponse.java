@@ -29,10 +29,17 @@ public class RestResponse<T> {
         return new RestResponse<>(true,"İşlem başarılı",data,LocalDateTime.now());
     }
 
-    // Mesaj özelleştirmek istersen
     public static <T> RestResponse<T> empty() {
 
         return new RestResponse<>(true, "İşlem Başarılı", null, LocalDateTime.now());
+    }
+
+    public static <T> RestResponse<T> created(T data) {
+        return new RestResponse<>(true,"created",data,LocalDateTime.now());
+    }
+
+    public static <T> RestResponse<T> error(T data) {
+        return new RestResponse<>(false,"error",null,LocalDateTime.now());
     }
 
     public boolean isStatus() {

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-10T03:11:04+0300",
+    date = "2025-12-12T04:18:13+0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
 )
 @Component
@@ -22,13 +22,15 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        User user = new User();
+        User.UserBuilder user = User.builder();
 
-        user.setId( Response.getId() );
-        user.setUsername( Response.getUsername() );
-        user.setEmail( Response.getEmail() );
+        user.firstname( Response.getFirstname() );
+        user.lastname( Response.getLastname() );
+        user.email( Response.getEmail() );
+        user.active( Response.isActive() );
+        user.locked( Response.isLocked() );
 
-        return user;
+        return user.build();
     }
 
     @Override
@@ -40,8 +42,11 @@ public class UserMapperImpl implements UserMapper {
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
         userResponse.id( entity.getId() );
-        userResponse.username( entity.getUsername() );
+        userResponse.firstname( entity.getFirstname() );
+        userResponse.lastname( entity.getLastname() );
         userResponse.email( entity.getEmail() );
+        userResponse.active( entity.isActive() );
+        userResponse.locked( entity.isLocked() );
 
         return userResponse.build();
     }
@@ -54,7 +59,8 @@ public class UserMapperImpl implements UserMapper {
 
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
-        userResponse.username( dto.getUsername() );
+        userResponse.firstname( dto.getFirstname() );
+        userResponse.lastname( dto.getLastname() );
         userResponse.email( dto.getEmail() );
 
         return userResponse.build();
@@ -66,13 +72,14 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        User user = new User();
+        User.UserBuilder user = User.builder();
 
-        user.setUsername( dto.getUsername() );
-        user.setEmail( dto.getEmail() );
-        user.setPassword( dto.getPassword() );
+        user.firstname( dto.getFirstname() );
+        user.lastname( dto.getLastname() );
+        user.email( dto.getEmail() );
+        user.password( dto.getPassword() );
 
-        return user;
+        return user.build();
     }
 
     @Override

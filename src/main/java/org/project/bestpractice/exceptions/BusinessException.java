@@ -1,16 +1,15 @@
 package org.project.bestpractice.exceptions;
 
 import lombok.Getter;
+import org.project.bestpractice.handling.ErrorCode;
 
 @Getter
-public class BusinessException extends RuntimeException{
-    private MessageTypes messageType;
+public class BusinessException extends RuntimeException {
 
-    BusinessException(){
+    private final ErrorCode errorCode;
 
-    }
-    public BusinessException(MessageTypes messageType){
-        super(messageType.getMessage());
-        this.messageType=messageType;
+    public BusinessException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 }
