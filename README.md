@@ -13,7 +13,8 @@ Bu şablon aşağıdaki temel yapıları hazır olarak sunar:
 * **DTO (Data Transfer Object) Pattern:** Entity nesnelerinin API katmanına sızdırılmaması için ModelMapper/MapStruct entegrasyonu ile DTO dönüşüm yapısı.
 * **Input Validation:** `jakarta.validation` kütüphanesi ile gelen isteklerin (Request Body) doğrulanması ve anlamlı hata mesajlarının üretilmesi.
 * **Layered Architecture:** Controller, Service, Repository ve Entity katmanlarının net bir şekilde ayrıştırıldığı temiz kod yapısı.
-* **Swagger / OpenAPI:** API dokümantasyonu için hazır konfigürasyon (Opsiyonel).
+* **Swagger / OpenAPI:** API dokümantasyonu için hazır konfigürasyon.
+* **Spring Security ve Jwt token ile rol tabanlı yetkilendirme sistemi.
 
 ## Teknoloji Yığını
 
