@@ -1,10 +1,8 @@
 package org.project.bestpractice.service.concretes;
 
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.transaction.Transactional;
 import org.project.bestpractice.configuration.mapper.UserMapper;
 import org.project.bestpractice.dto.response.UserResponse;
-import org.project.bestpractice.entities.RefreshToken;
 import org.project.bestpractice.entities.Role;
 import org.project.bestpractice.entities.User;
 import org.project.bestpractice.exceptions.BusinessException;
@@ -12,12 +10,10 @@ import org.project.bestpractice.handling.ErrorCode;
 import org.project.bestpractice.jwt.JwtService;
 import org.project.bestpractice.payload.AuthenticationRequest;
 import org.project.bestpractice.payload.AuthenticationResponse;
-import org.project.bestpractice.payload.RefreshTokenRequest;
 import org.project.bestpractice.payload.RegisterRequest;
 import org.project.bestpractice.repository.RefreshTokenRepository;
 import org.project.bestpractice.repository.RoleRepository;
 import org.project.bestpractice.repository.UserRepository;
-import org.project.bestpractice.security.UserPrincipal;
 import org.project.bestpractice.service.abstracts.AuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,16 +22,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
-import java.util.Date;
-import java.util.Optional;
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
-
-    @Value("${application.security.jwt.refresh-token.expiration}")
-    private long refreshExpiration;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -73,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(request.password()))
                 .active(true)
                 .locked(false)
-                .user_roles(Set.of(userRole))
+                .user_roles(new HashSet<>(Set.of(userRole)))
                 .build();
         var userDB = userRepository.save(user);
         return userMapper.toResponseFromEntity(userDB);
@@ -92,6 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException(request.email()));
 
         var token = jwtService.generateToken(user);
+        revokeAllUserRefreshTokens(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         refreshTokenRepository.save(refreshToken);
         return new AuthenticationResponse(token,refreshToken.getRefreshToken());
@@ -104,8 +96,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         validUserTokens.forEach(token -> {
             token.setRevoked(true);
         });
-
-        // Hepsini tek seferde (Batch) kaydet
         refreshTokenRepository.saveAll(validUserTokens);
     }
 }

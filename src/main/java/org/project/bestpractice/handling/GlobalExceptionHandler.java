@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.project.bestpractice.exceptions.*;
+import org.project.bestpractice.utils.NetworkUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler {
         ApiErrorResponse<Map<String, List<String>>> apiErrorResponse = ApiErrorResponse.<Map<String, List<String>>>builder()
                 .createTime(LocalDateTime.now())
                 .path(request.getRequestURI())
-                .hostName(getHostName())
+                .hostName(NetworkUtils.getHostName())
                 .message("Validasyon Hatası!")
                 .id(UUID.randomUUID())
                 .data(errors)
@@ -112,7 +113,7 @@ public class GlobalExceptionHandler {
                 .createTime(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .message("Bilinmeyen bir hata gerçekleşti. Hata Kodu: " + traceId)
-                .hostName(getHostName())
+                .hostName(NetworkUtils.getHostName())
                 .build();
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -123,15 +124,8 @@ public class GlobalExceptionHandler {
                 .path(path)
                 .createTime(LocalDateTime.now())
                 .message(message)
-                .hostName(getHostName())
+                .hostName(NetworkUtils.getHostName())
                 .build();
         return new ResponseEntity<>(response, status);
-    }
-    private String getHostName() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "Unknown";
-        }
     }
 }
