@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -25,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
     protected void doFilterInternal(
@@ -55,12 +58,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
-            log.warn("JWT Token süresi dolmuş: {}", e.getMessage());
-            // Buradan exception fırlatmak yerine response'a 401 yazılabilir veya
-            // GlobalExceptionHandler değil, AuthenticationEntryPoint bunu yakalamalıdır.
-            // Şimdilik loglayıp geçiyoruz ama SecurityConfig'de exceptionHandling() ayarı şart.
+            log.error("JWT Hatası: {}", e.getMessage());
+            handlerExceptionResolver.resolveException(request, response, null, e);
         }catch(Exception e) {
-            System.out.println("Genel bir hata oluştu :"+ e.getMessage());
+            log.error("Security Filter Beklenmeyen Hata: ", e);
+            handlerExceptionResolver.resolveException(request, response, null, e);
         }
         filterChain.doFilter(request, response);
     }
