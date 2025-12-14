@@ -38,7 +38,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
         RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(request.getRefreshToken())
                 .orElseThrow(() -> new SignatureException(ErrorCode.AUTH_INVALID_SIGNATURE.getMessage()));
-        if(!isRefreshTokenExpired(refreshToken.getExpiryDate())){
+        if(isRefreshTokenExpired(refreshToken.getExpiryDate())){
             refreshTokenRepository.delete(refreshToken);
             throw new BusinessException(ErrorCode.AUTH_TOKEN_EXPIRED);
         }
