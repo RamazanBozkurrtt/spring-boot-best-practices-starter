@@ -1,6 +1,5 @@
 package org.project.bestpractice.payload;
 
-import org.project.bestpractice.jwt.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,8 +21,5 @@ public record RegisterRequest(
 
         @NotBlank(message = "Şifre boş olamaz")
         @Size(min = 6, max = 100, message = "Şifre en az 6 karakter olmalıdır")
-        String password,
-
-        @NotNull(message = "Rol belirtilmelidir")
-        Role role
+        String password
 ) { }

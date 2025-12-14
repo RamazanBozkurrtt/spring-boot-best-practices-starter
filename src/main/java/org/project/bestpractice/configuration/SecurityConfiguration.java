@@ -12,6 +12,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -27,24 +30,6 @@ public class SecurityConfiguration {
             "/swagger-ui.html"      // main page
     };
 
-    /*
-                // 1. CSRF Kapat (JWT kullandığımız için statelesstır, gerek yok)
-                .csrf(AbstractHttpConfigurer::disable)
-                // 2. İzin Kuralları (Authorize)
-                .authorizeHttpRequests(req -> req
-                        .requestMatchers(WHITE_LIST_URL).permitAll()  // Listtekilere izin ver
-                        .requestMatchers("/actuator/**").hasRole("ADMIN") // Actuator'a sadece ADMIN
-                        .anyRequest().authenticated()                 // Geri kalan her şey için Token iste
-                )
-                // 3. Session Yönetimi (Stateless)
-                // Spring Security'e diyoruz ki: "Sunucuda session tutma (HttpSession), her istek bağımsızdır."
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 4. Provider Tanımlaması
-                .authenticationProvider(authenticationProvider)
-                // 5. Filtre Sıralaması
-                // UsernamePasswordAuthenticationFilter (Standart login) çalışmadan önce bizim JWT filtresi çalışsın.
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,6 +37,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req->req
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
+                        .requestMatchers("/rest/api/user/**").hasAnyRole("USER","ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
