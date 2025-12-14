@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse deleteUserSoftlyById(UUID id) {
         var user = userRepository.findById(id).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
         user.setActive(false);
-        authenticationServiceImpl.revokeAllUserTokens(user);
+        authenticationServiceImpl.revokeAllUserRefreshTokens(user);
         userRepository.save(user);
         return userMapper.toResponseFromEntity(user);
     }
