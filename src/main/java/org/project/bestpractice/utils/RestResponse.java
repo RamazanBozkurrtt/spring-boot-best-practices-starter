@@ -1,77 +1,49 @@
 package org.project.bestpractice.utils;
 
-
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class RestResponse<T> {
 
-    private boolean status;
+    private int statusCode;
+    private String status;
     private String message;
     private T data;
     private LocalDateTime responseTime;
+    private boolean isSuccess;
 
-    public RestResponse() {}
 
-    public RestResponse(boolean status, String message, T data, LocalDateTime responseTime) {
-        this.setStatus(status);
-        this.setMessage(message);
-        this.setData(data);
-        this.setResponseTime(responseTime);
+    private RestResponse(HttpStatus status, String message, T data, boolean isSuccess) {
+        this.statusCode = status.value();
+        this.status = status.name();
+        this.message = message;
+        this.data = data;
+        this.isSuccess = isSuccess;
+        this.responseTime = LocalDateTime.now();
     }
 
     public static <T> RestResponse<T> ok(T data) {
-
-        return new RestResponse<>(true,"success",data,LocalDateTime.now());
-    }
-
-    public static <T> RestResponse<T> of(T data) {
-        return new RestResponse<>(true,"İşlem başarılı",data,LocalDateTime.now());
-    }
-
-    public static <T> RestResponse<T> empty() {
-
-        return new RestResponse<>(true, "İşlem Başarılı", null, LocalDateTime.now());
+        return new RestResponse<>(HttpStatus.OK, "Success", data, true);
     }
 
     public static <T> RestResponse<T> created(T data) {
-        return new RestResponse<>(true,"created",data,LocalDateTime.now());
+        return new RestResponse<>(HttpStatus.CREATED, "Created successfully", data, true);
     }
 
-    public static <T> RestResponse<T> error(T data) {
-        return new RestResponse<>(false,"error",null,LocalDateTime.now());
+    public static <T> RestResponse<T> empty() {
+        return new RestResponse<>(HttpStatus.NO_CONTENT, "No Content", null, true);
     }
 
-    public boolean isStatus() {
-        return status;
+    public static <T> RestResponse<T> error(T data, HttpStatus status, String message) {
+        return new RestResponse<>(status, message, data, false);
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public LocalDateTime getResponseTime() {
-        return responseTime;
-    }
-
-    public void setResponseTime(LocalDateTime responseTime) {
-        this.responseTime = responseTime;
+    public static <T> RestResponse<T> error(HttpStatus status, String message) {
+        return new RestResponse<>(status, message, null, false);
     }
 }
-

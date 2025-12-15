@@ -14,6 +14,7 @@ import org.project.bestpractice.security.UserPrincipal;
 import org.project.bestpractice.service.abstracts.RefreshTokenService;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
@@ -51,8 +52,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return new AuthenticationResponse(token,refreshTokenDB.getRefreshToken());
     }
 
-    private boolean isRefreshTokenExpired(Date expiryDate) {
-        return new Date().after(expiryDate);
+    private boolean isRefreshTokenExpired(Instant expiryDate) {
+        return Instant.now().isAfter(expiryDate);
     }
 
 }

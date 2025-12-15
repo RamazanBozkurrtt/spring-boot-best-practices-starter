@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    # URL, Username ve Password Sunucudan okunur. Kodda yazmaz!
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
