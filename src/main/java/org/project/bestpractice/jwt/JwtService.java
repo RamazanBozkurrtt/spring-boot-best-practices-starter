@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,12 +58,13 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
+        Instant now = Instant.now();
         return Jwts
                 .builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(expiration)))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -75,13 +77,14 @@ public class JwtService {
                 .refreshToken(buildToken(new HashMap<>(), new UserPrincipal(user), refreshExpiration))
                 .revoked(false)
                 .user(user)
-                .expiryDate(new Date(System.currentTimeMillis()+refreshExpiration))
+                .expiryDate(Instant.now().plusMillis(refreshExpiration))
                 .build();
     }
 
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        return (extractUsername(token).equals(userDetails.getUsername())) && !isTokenExpired(token);
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
     public boolean isTokenExpired(String token) {

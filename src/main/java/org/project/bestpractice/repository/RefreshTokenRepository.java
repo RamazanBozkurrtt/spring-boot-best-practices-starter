@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,4 +22,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Integ
 
     @Query("SELECT rt FROM RefreshToken rt INNER JOIN rt.user u WHERE u.id = :userId AND rt.revoked = false")
     List<RefreshToken> findAllValidRefreshTokenByUser(UUID userId);
+
+    void deleteByExpiryDateBefore(Instant expiryDateBefore);
 }

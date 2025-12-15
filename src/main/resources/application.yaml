@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: BestPractice
+  profiles:
+    active: dev
+
+
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  info:
+    git:
+      mode: full
+    build:
+      enabled: true
+  health:
+    diskspace:
+      threshold: 10MB
+
+server:
+  shutdown: graceful
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 1.0.0
+    description: Best Practice API
+
+application:
+  security:
+    jwt:
+      expiration: 60000        #7200000
+      refresh-token:
+        expiration: 86400000   #3600000
