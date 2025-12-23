@@ -4,7 +4,7 @@ import org.project.bestpractice.utils.RestResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public abstract class RestBaseController { // Abstract olması mantıklı, tek başına new'lenmez.
+public abstract class RestBaseController {
 
     public <T> ResponseEntity<RestResponse<T>> ok(T data) {
         return ResponseEntity.ok(RestResponse.ok(data));
